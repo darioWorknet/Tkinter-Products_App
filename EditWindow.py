@@ -14,7 +14,7 @@ class EditWindow(Frame):
     def create_frame(self):
         # Definimos el frame
         frame = LabelFrame(self.window, text="Editar el siguiente Producto", font=('Calibri', 16, 'bold'))
-        frame.grid(row=1, column=0, columnspan=20, pady=20)
+        frame.grid(row=1, column=0, columnspan=2, pady=20)
         # Nombre nuevo
         self.label_name = new_label(frame, "Nombre nuevo: ", row=2, column=0)
         self.entry_name = new_entry(frame, default_txt=self.parent.product_name, row=2, column=1)
@@ -40,7 +40,7 @@ class EditWindow(Frame):
         # Dependiendo de si hemos conseguido actulizar el producto mostramos un aviso u otro
         if updated: # Aviso en la ventana padre
             self.window.destroy() # Cerramos la ventana actual
-            self.parent.fill_table()
+            self.parent.update_all()
             self.parent.message['text'] = f"Producto {old_name!r} actulizado con éxito\nNuevo nombre: {new_name!r}"
         else: # Aviso en la ventana actual
             self.message['text'] = "Todos los campos son obligatorios"

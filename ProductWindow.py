@@ -1,3 +1,4 @@
+from CreateCategorieWindow import CreateCategorieWindow
 from EditWindow import EditWindow
 from tkinter import *
 from tk_helper import *
@@ -31,18 +32,26 @@ class ProductWindow(Frame):
         # Precio
         self.label_price = new_label(frame, 'Precio: ', row=2, column=0)
         self.entry_price = new_entry(frame, row=2, column=1)
+        # Categoria
+        self.label_categ = new_label(frame, 'Categoria: ', row=3, column=0)
+        categories = self.db.get_categories() # Query to db
+        self.categorie_selection = StringVar(frame)
+        self.menu_categ = new_option_menu(frame, self.categorie_selection, *categories, row=3, column=1, sticky=W+E)
+        self.crete_cat = new_button(frame, '+', self.add_categorie, row=3, column=2, width=3)
         # Boton
-        self.button_add = new_button(frame, 'Guardar producto', self.add_product, row=3, columnspan=2, sticky=W+E)
+        self.button_add = new_button(frame, 'Guardar producto', self.add_product, row=4, columnspan=2, sticky=W+E)
         # Mensaje
-        self.message = new_label(frame=None, text='', fg='red', row=3, column=0, columnspan=2, sticky=W+E)
+        self.message = new_label(frame=None, text='', fg='red', row=5, column=0, columnspan=2, sticky=W+E)
     
     def create_table(self):
-        self.table = new_table('Nombre', 'Precio', row=4, column=0, columnspan=2)
+        self.table = new_table('Nombre', 'Precio', 'Categoría', row=6, column=0, columnspan=2)
         self.fill_table()
 
     def create_action_buttons(self):
-        self.delete_button = new_button(None, 'ELIMINAR', self.del_product, row=5, columnspan=1, column=0, sticky=W+E)
-        self.edit_button = new_button(None, 'EDITAR', self.edit_product, row=5, columnspan=1, column=1, sticky=W+E)
+        self.delete_button = new_button(None, 'ELIMINAR', self.del_product, row=7, columnspan=1, column=0, sticky=W+E)
+        # self.edit_button = new_button(None, 'EDITAR', self.edit_product, row=7, columnspan=1, column=1, sticky=W+E)
+        self.edit_button = new_button(None, 'EDITAR', self.print_something, row=7, columnspan=1, column=1, sticky=W+E)
+
 
     def add_product(self):
         # Atributos del producto
@@ -73,14 +82,14 @@ class ProductWindow(Frame):
         # Rellenar la tabla
         for product in products:
             print(product)
-            self.table.insert('', 0, text=product[1], values=product[2])
+            self.table.insert('', 0, text=product[0], values=(product[1], product[2]))
 
     def del_product(self):
         product_name = self.table.item(self.table.selection())['text']
         if product_name:
             # print(f"Borrando producto: {product_name}")
             self.db.del_product(product_name)
-            self.fill_table()
+            self.update_all()
             self.message['text'] = f"Producto {product_name!r} eliminado con éxito"
         else:
             # print("Por favor seleccione un producto")
@@ -91,12 +100,32 @@ class ProductWindow(Frame):
         values = self.table.item(self.table.selection())['values']
         if self.product_name and values:
             self.product_price = values[0]
-            # print(f"Fila seleccionada: {self.product_name = } {self.product_price = }")
             self.edit_window = EditWindow(self)
+            self.update_all()
         else:
-            # print("Por favor seleccione un producto")
             self.message['text'] = "Por favor seleccione un producto"
             return
 
-    def say_hello(self):
-        print("Hello from parent class")
+    def add_categorie(self):
+        self.new_categorie_window = CreateCategorieWindow(self)
+
+    def update_menu(self, default=None):
+        self.menu_categ['menu'].delete(0,'end')
+        categories = self.db.get_categories()
+        for categorie in categories:
+            self.menu_categ['menu'].add_command(label=categorie, command=lambda: self.categorie_selection.set(categorie))
+        if default:
+            self.categorie_selection.set(default)
+        else:
+            self.categorie_selection.set(categories[0])
+
+    def update_all(self):
+        self.fill_table()
+        self.update_menu()
+
+    def print_something(self): # debugging
+        selection = self.categorie_selection.get()
+        if selection != "":          
+            self.message['text'] = f"Se ha seleccionado la categoria {selection!r}"
+        else:
+            self.message['text'] = "Selecciona una categoria"

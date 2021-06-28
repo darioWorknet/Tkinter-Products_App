@@ -13,10 +13,18 @@ def new_entry(frame, default_txt=None, **kwargs):
     entry.grid(**kwargs) # Recibe la informacion relativa al layout como **kwargs
     return entry
 
-def new_button(frame, text, command, **kwargs):
-    button = ttk.Button(frame, text=text, command=command)
+def new_button(frame, text, command, width=None, **kwargs):
+    button = ttk.Button(frame, text=text, command=command, width=width)
     button.grid(**kwargs) # Recibe la informacion relativa al layout como **kwargs
     return button
+
+def new_option_menu(frame, variable, *categories, **kwargs):
+    variable.set("")
+    if categories:
+        variable.set(categories[0])
+    option_menu = OptionMenu(frame, variable, *categories)
+    option_menu.grid(**kwargs)
+    return option_menu
 
 def new_table (*args, **kwargs):
     # Recibe el nombre de las columnas como *args
