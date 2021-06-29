@@ -21,24 +21,25 @@ class DB:
 
     def get_categorie_ID(self, categorie):
         query = f'SELECT id FROM categoria WHERE nombre = ?'
-        result = db.db_query(query, categorie)
-        for r in result:
-            return r
+        result = self.db_query(query, categorie)
+        return result.fetchall()[0]
+  
 
     def get_categories(self):
         query = 'SELECT nombre FROM categoria ORDER BY nombre'
         result = self.db_query(query)
-        return [x[0] for x in result]         
+        return [x[0] for x in result]       
 
-    def add_product(self, name, price):
-        query = 'INSERT INTO producto VALUES (NULL, ?, ?)'
-        self.db_query(query, name, price)
+    def add_product(self, name, price, categorie):
+        categorie_id, = self.get_categorie_ID(categorie)
+        query = 'INSERT INTO producto VALUES (NULL, ?, ?, ?)'
+        self.db_query(query, name, price, float(categorie_id))
 
     def item_in_table(self, table, col, item):
         query = f'SELECT {col} FROM {table}'
         result = self.db_query(query)
-        for r in result:
-            if item in r:
+        for r, in result:
+            if item == r:
                 return True
         return False
 
@@ -71,6 +72,13 @@ if __name__ == '__main__':
     db = 'database/productos.db'
     db = DB(db)
 
+    res = db.get_categories()
+    print(res)
+
+    bol = db.item_in_table(table="categoria", col="nombre", item="Test")
+    print(bol)
+
+
     # db.add_product("new", 111) # Añadir nuevo producto
 
     # db.del_product('new') # Borrar producto
@@ -84,14 +92,14 @@ if __name__ == '__main__':
 
     # print(db.get_categories())
 
-    query =  '''SELECT p.nombre, p.precio, c.nombre
-                FROM producto as p 
-                INNER JOIN categoria as c
-                ON p.categoriaID = c.ID'''
+    # query =  '''SELECT p.nombre, p.precio, c.nombre
+    #             FROM producto as p 
+    #             INNER JOIN categoria as c
+    #             ON p.categoriaID = c.ID'''
 
-    result = db.db_query(query)
-    for r in result:
-        print(r)
+    # result = db.db_query(query)
+    # for r in result:
+    #     print(r)
 
 
     # query = 'SELECT id FROM categoria WHERE categoria = "Gaming"'

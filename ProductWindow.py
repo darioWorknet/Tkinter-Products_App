@@ -57,20 +57,19 @@ class ProductWindow(Frame):
         # Atributos del producto
         product_name = self.entry_name.get()
         product_price = self.entry_price.get()
-        if product_name and product_price:
-            print("Producto anadido")
-            self.message['text'] = f'Producto {product_name!r} añadido con éxito'
-            self.db.add_product(product_name, product_price)
+        product_categorie = self.categorie_selection.get()
+        if product_name and product_price and product_categorie:
+            self.db.add_product(product_name, product_price, product_categorie)
             self.fill_table()
-        elif not product_name and product_price:
-            print('El nombre es obligatorio')
+            self.message['text'] = f'Producto {product_name!r} añadido con éxito'
+        elif not product_name and product_price and product_categorie:
             self.message['text'] = 'El nombre es obligatorio'
-        elif product_name and not product_price:
-            print('El precio es obligatorio')
+        elif product_name and not product_price and product_categorie:
             self.message['text'] = 'El precio es obligatorio'
-        else:
-            print('El nombre y el precio son obligatorios')
-            self.message['text'] = 'El nombre y el precio son obligatorios'
+        elif product_name and product_price and not product_categorie:
+            self.message['text'] = 'La categoría es obligatoria'
+        else: 
+            self.message['text'] = 'Todos los campos son obligatorios'
 
     def fill_table(self):
         # Limpiar la tabla
@@ -124,8 +123,10 @@ class ProductWindow(Frame):
         self.update_menu()
 
     def print_something(self): # debugging
-        selection = self.categorie_selection.get()
-        if selection != "":          
-            self.message['text'] = f"Se ha seleccionado la categoria {selection!r}"
+        product = self.entry_name.get()
+        price = self.entry_price.get()
+        categorie = self.categorie_selection.get()
+        if categorie != "":          
+            self.message['text'] = f"Se ha seleccionado {product=} {price=} {categorie=}"
         else:
             self.message['text'] = "Selecciona una categoria"
