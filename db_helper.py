@@ -58,10 +58,12 @@ class DB:
         query = 'DELETE FROM categoria WHERE nombre = ?'
         self.db_query(query, categorie)
 
-    def update_product(self, new_name, new_price, old_name, old_price):
+    def update_product(self, new_name, new_price, new_categorie, old_name, old_price, old_categorie):
         if new_name and new_price and old_name and old_price:
-            query = 'UPDATE producto SET nombre = ?, precio = ? WHERE nombre = ? AND precio = ?'
-            self.db_query(query, new_name, new_price, old_name, old_price)
+            old_id, = self.get_categorie_ID(old_categorie)
+            new_id,= self.get_categorie_ID(new_categorie)
+            query = 'UPDATE producto SET nombre = ?, precio = ?, categoriaID = ? WHERE nombre = ? AND precio = ? AND categoriaID = ?'
+            self.db_query(query, new_name, new_price, new_id, old_name, old_price, old_id)
             return True
         return False
 

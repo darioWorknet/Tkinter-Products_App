@@ -26,9 +26,13 @@ class CreateCategorieWindow(Frame):
     def commit_changes(self):
         new_categorie = self.entry_name.get()
         if new_categorie:
-            query_result = self.parent.db.add_categorie(new_categorie)
+            try:
+                query_result = self.parent.db.add_categorie(new_categorie)
+            except Exception:
+                query_result = self.parent.parent.db.add_categorie(new_categorie)
             if query_result:
                 self.window.destroy() # Cerramos la ventana actual
+                # menu, categories, variable, default=None
                 self.parent.update_menu(new_categorie)
                 self.parent.message["text"] = f"Categoría {new_categorie!r} añadida con éxito a la base de datos"
             else:

@@ -48,9 +48,8 @@ class ProductWindow(Frame):
         self.fill_table()
 
     def create_action_buttons(self):
-        self.delete_button = new_button(None, 'ELIMINAR', self.del_product, row=7, columnspan=1, column=0, sticky=W+E)
-        # self.edit_button = new_button(None, 'EDITAR', self.edit_product, row=7, columnspan=1, column=1, sticky=W+E)
-        self.edit_button = new_button(None, 'EDITAR', self.print_something, row=7, columnspan=1, column=1, sticky=W+E)
+        self.delete_button = new_button(None, 'ELIMINAR', self.update_all, row=7, columnspan=1, column=0, sticky=W+E) # del.product
+        self.edit_button = new_button(None, 'EDITAR', self.edit_product, row=7, columnspan=1, column=1, sticky=W+E) # edit.product
 
 
     def add_product(self):
@@ -99,7 +98,8 @@ class ProductWindow(Frame):
         values = self.table.item(self.table.selection())['values']
         if self.product_name and values:
             self.product_price = values[0]
-            self.edit_window = EditWindow(self)
+            self.product_categorie = values[1]
+            self.edit_window = EditWindow(self, self.product_categorie)
             self.update_all()
         else:
             self.message['text'] = "Por favor seleccione un producto"
@@ -109,14 +109,7 @@ class ProductWindow(Frame):
         self.new_categorie_window = CreateCategorieWindow(self)
 
     def update_menu(self, default=None):
-        self.menu_categ['menu'].delete(0,'end')
-        categories = self.db.get_categories()
-        for categorie in categories:
-            self.menu_categ['menu'].add_command(label=categorie, command=lambda: self.categorie_selection.set(categorie))
-        if default:
-            self.categorie_selection.set(default)
-        else:
-            self.categorie_selection.set(categories[0])
+        update_menu(self.menu_categ, self.db.get_categories(), self.categorie_selection, default) # funcion custom de tkinter_helper
 
     def update_all(self):
         self.fill_table()

@@ -48,3 +48,15 @@ def new_window(title):
     window.resizable(1, 1) # Activar la redimension de la ventana. Para desactivarla: (0,0)
     window.wm_iconbitmap('recursos/icon.ico') # Icono de la ventana
     return window
+
+def update_menu(this_menu, items, variable, default=None):
+    this_menu['menu'].delete(0,'end') # Borramos el contenido del boton
+    for item in items:           # Introducimos los nuevos elementos
+        this_menu['menu'].add_command(label=item, command=lambda x=item: variable.set(x))
+    if default:
+        variable.set(default)   # Mostramos el valor por defecto
+    else:
+        variable.set(items[0])  # En caso contrario mostramos el primer elemento de la lista
+
+def set_item(variable, item):
+    variable.set(item)
