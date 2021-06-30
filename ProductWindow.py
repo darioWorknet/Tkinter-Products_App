@@ -44,10 +44,12 @@ class ProductWindow(Frame):
         self.message = new_label(frame=None, text='', fg='red', row=5, column=0, columnspan=2, sticky=W+E)
     
     def create_table(self):
+        # Metodo  de tk helper, nos permite crear una tabla pasandole el nombre de las columnas
         self.table = new_table('Nombre', 'Precio', 'Categoría', row=6, column=0, columnspan=2)
         self.fill_table()
 
     def create_action_buttons(self):
+        # Botones que llaman a los metodos para eliminar y editar los productos
         self.delete_button = new_button(None, 'ELIMINAR', self.del_product, row=7, columnspan=1, column=0, sticky=W+E) # del.product
         self.edit_button = new_button(None, 'EDITAR', self.edit_product, row=7, columnspan=1, column=1, sticky=W+E) # edit.product
 
@@ -56,11 +58,13 @@ class ProductWindow(Frame):
         product_name = self.entry_name.get()
         product_price = self.entry_price.get()
         product_categorie = self.categorie_selection.get()
-        if product_name and product_price and product_categorie:
-            self.db.add_product(product_name, product_price, product_categorie)
+        if not product_price.replace('.','',1).isnumeric(): # Comprobamos que el valor introducido sea un numero entero o decimal
+            self.message['text'] = f'El precio debe ser un valor numérico'
+        elif product_name and product_price and product_categorie: # Si se introducen los 3 campos se guarda en la base de datos
+            self.db.add_product(product_name, product_price, product_categorie) # Metodo que introduce el producto en la base de datos
             self.fill_table()
             self.message['text'] = f'Producto {product_name!r} añadido con éxito'
-        elif not product_name and product_price and product_categorie:
+        elif not product_name and product_price and product_categorie: # Casos en los que falta algun campo
             self.message['text'] = 'El nombre es obligatorio'
         elif product_name and not product_price and product_categorie:
             self.message['text'] = 'El precio es obligatorio'
@@ -78,47 +82,44 @@ class ProductWindow(Frame):
         products = self.db.get_products()
         # Rellenar la tabla
         for product in products:
-            print(product)
             self.table.insert('', 0, text=product[0], values=(product[1], product[2]))
 
     def del_product(self):
-        product_name = self.table.item(self.table.selection())['text']
-        if product_name:
-            # print(f"Borrando producto: {product_name}")
-            self.db.del_product(product_name)
-            self.update_all()
+        product_name = self.table.item(self.table.selection())['text'] # Obtenemos el nombre del producto seleccionado
+        if product_name:                       # Comprobamos que se haya seleccionado alguna fila de la tabla
+            self.db.del_product(product_name)  # LLamamos al metodo que borra una fila de la base de datos dado un producto
+            self.fill_table()                  # Actualizamos los valores de la tabla
             self.message['text'] = f"Producto {product_name!r} eliminado con éxito"
         else:
-            # print("Por favor seleccione un producto")
             self.message['text'] = "Por favor seleccione un producto"
 
     def edit_product(self):
-        self.product_name = self.table.item(self.table.selection())['text']
-        values = self.table.item(self.table.selection())['values']
+        self.product_name = self.table.item(self.table.selection())['text'] # Obtenemos la primera columna (nombre)
+        values = self.table.item(self.table.selection())['values'] # Obtenemos el resto de columnas
         if self.product_name and values:
-            self.product_price = values[0]
-            self.product_categorie = values[1]
+            self.product_price = values[0]     # Precio
+            self.product_categorie = values[1] # Categoria
+            # Creamos una ventana auxiliar para insertar los nuevos campos del producto
+            # Le pasamos la instancia de esta clase (para acceder a ciertos atributos) y la categoria por defecto
             self.edit_window = EditWindow(self, self.product_categorie)
-            self.update_all()
         else:
             self.message['text'] = "Por favor seleccione un producto"
-            return
 
     def add_categorie(self):
+        # Creamos una ventana auxiliar para crear una nueva categoria
+        # Le pasamos la instancia de esta clase para acceder a ciertos atriburos y metodos
         self.new_categorie_window = CreateCategorieWindow(self)
 
     def update_menu(self, default=None):
-        update_menu(self.menu_categ, self.db.get_categories(), self.categorie_selection, default) # funcion custom de tkinter_helper
+        # Metodo de tk_helper, creado para reutilizar el codigo
+        update_menu(self.menu_categ, self.categorie_selection, self.db.get_categories(), default)
 
     def update_all(self):
         self.fill_table()
         self.update_menu()
 
-    def print_something(self): # debugging
-        product = self.entry_name.get()
-        price = self.entry_price.get()
-        categorie = self.categorie_selection.get()
-        if categorie != "":          
-            self.message['text'] = f"Se ha seleccionado {product=} {price=} {categorie=}"
-        else:
-            self.message['text'] = "Selecciona una categoria"
+    def del_non_using_categories(self):
+        # Metodo que elimina las categorias que no estan siendo utilizadas en la tabla producto
+        self.db.del_non_using_categories()
+        # Actualizamos los campos del menu desplegable
+        self.update_menu()

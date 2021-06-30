@@ -22,29 +22,29 @@ class CreateCategorieWindow(Frame):
         # Boton guardar cambios
         self.update_button = new_button(frame, 'Añadir', self.commit_changes, row=3, columnspan=2, sticky=W+E)
         # Boton eliminar categorias en desuso
-        self.update_button = new_button(frame, 'Eliminar categorias en desuso', self.delete_non_using_categories, row=4, columnspan=2, sticky=W+E)
+        self.update_button = new_button(frame, 'Eliminar categorias en desuso', self.parent.del_non_using_categories, row=4, columnspan=2, sticky=W+E)
         # Mensaje
         self.message = new_label(frame, text='', fg='red', row=5, column=0, columnspan=2, sticky=W+E)
 
     def commit_changes(self):
+        # Cogemos la categoria introducida por el usuario
         new_categorie = self.entry_name.get()
+        # Comprobamos que haya introducido algun dato
         if new_categorie:
+            # Introducimos la categoria en la base de datos
+            # Puede que se haya llamado a este metodo desde una instancia de ProductWindow o EditWindow
+            # Dependiendo del caso, la relacion de parentesco entre objetos cambia
             try:
                 query_result = self.parent.db.add_categorie(new_categorie)
             except Exception:
                 query_result = self.parent.parent.db.add_categorie(new_categorie)
+            # Si el resultado de la query ha sido positivo
             if query_result:
                 self.window.destroy() # Cerramos la ventana actual
-                # menu, categories, variable, default=None
-                self.parent.update_menu(new_categorie)
+                self.parent.update_menu(new_categorie) # Actulizamos el desplegable en la ventana padre
                 self.parent.message["text"] = f"Categoría {new_categorie!r} añadida con éxito a la base de datos"
             else:
                 self.message["text"] = "El elemento ya existe en la base de datos"
+        # En caso de que no haya introducido ninguna categoria, mostramos el siguiente aviso
         else:
             self.message["text"] = "Debes introducir una categoria"
-
-    def delete_non_using_categories(self):
-        try:
-            self.parent.db.del_not_using_categories()
-        except Exception:
-            self.parent.parent.db.del_not_using_categories()

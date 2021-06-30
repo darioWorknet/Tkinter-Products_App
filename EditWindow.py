@@ -27,7 +27,6 @@ class EditWindow(Frame):
         self.entry_price = new_entry(frame, default_txt=self.parent.product_price, row=3, column=1)
         # Categoria nueva
         self.label_categorie = new_label(frame, "Categoría nueva: ", row=4, column=0)
-        # self.entry_categorie = new_entry(frame, default_txt=self.parent.product_categorie, row=4, column=1)
         categories = self.parent.db.get_categories() # Query to db
         self.categorie_selection = StringVar(frame)
         self.menu_categ = new_option_menu(frame, self.categorie_selection, *categories, row=4, column=1, sticky=W+E)
@@ -38,15 +37,13 @@ class EditWindow(Frame):
         self.message = new_label(frame, text='', fg='red', row=6, column=0, columnspan=2, sticky=W+E)
 
     def update_product(self):
-        # Obtenemos la informacion del producto
+        # Obtenemos la informacion del producto, tanto la previa como la nueva
         old_name = self.parent.product_name
         new_name = self.entry_name.get()
         old_price = self.parent.product_price
         new_price = self.entry_price.get()
         old_categorie = self.parent.product_categorie
         new_categorie = self.categorie_selection.get()
-        # print("Actualizando producto: ", end='')
-        print(f'{old_name=}, {new_name=}, {old_price=}, {new_price=}, {old_categorie=}, {new_categorie=}')
         # Tratamos de actulizar el producto, evaluamos el resultado con un booleano
         updated = self.parent.db.update_product(new_name, new_price, new_categorie, old_name, old_price, old_categorie)
         # Dependiendo de si hemos conseguido actulizar el producto mostramos un aviso u otro
@@ -58,8 +55,12 @@ class EditWindow(Frame):
             self.message['text'] = "Todos los campos son obligatorios"
 
 
-    def update_menu(self, default=None): # menu, categories, variable, default=None
-        update_menu(self.menu_categ, self.parent.db.get_categories(), self.categorie_selection, default)
+    def update_menu(self, default=None):
+        # Metodo de tk_helper, para reutilizar el codigo
+        update_menu(self.menu_categ, self.categorie_selection, self.parent.db.get_categories(), default)
+        self.parent.update_menu(default) # Actualizamos a su vez el menu de la ventana padre
 
     def add_categorie(self):
+        # Creamos una ventana auxiliar para introducir una nueva categoria
+        # Le pasamos la instancia de esta clase (para acceder a ciertos atributos) y la categoria por defecto
         self.new_categorie_window = CreateCategorieWindow(self)

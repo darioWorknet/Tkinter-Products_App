@@ -22,6 +22,8 @@ def new_option_menu(frame, variable, *categories, **kwargs):
     variable.set("")
     if categories:
         variable.set(categories[0])
+    else:
+        categories = [""]
     option_menu = OptionMenu(frame, variable, *categories)
     option_menu.grid(**kwargs)
     return option_menu
@@ -49,13 +51,15 @@ def new_window(title):
     window.wm_iconbitmap('recursos/icon.ico') # Icono de la ventana
     return window
 
-def update_menu(this_menu, items, variable, default=None):
+def update_menu(this_menu, variable, items, default=None):
     this_menu['menu'].delete(0,'end') # Borramos el contenido del boton
+    if not items:
+        items = ['']
     for item in items:           # Introducimos los nuevos elementos
         this_menu['menu'].add_command(label=item, command=lambda x=item: variable.set(x))
     if default:
         variable.set(default)   # Mostramos el valor por defecto
-    else:
+    elif items:
         variable.set(items[0])  # En caso contrario mostramos el primer elemento de la lista
 
 def set_item(variable, item):
