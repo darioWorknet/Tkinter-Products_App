@@ -4,7 +4,13 @@ from tkinter import *
 from tk_helper import *
 from db_helper import DB
 
+
 class ProductWindow(Frame):
+    # Estilos
+    TEXT = ('Calibri', 13)
+    BUTTON = ('Calibri', 14, 'bold')
+    TITLE =('Calibri', 16, 'bold')
+
     def __init__(self, master):
         super().__init__(master)
         self.master = master # root
@@ -24,22 +30,22 @@ class ProductWindow(Frame):
 
     def create_frame(self):
         # Creacion del frame (padre)
-        frame = LabelFrame(self.master, text="Registrar un nuevo Producto", font=('Calibri', 16, 'bold'))
+        frame = LabelFrame(self.master, text="Registrar un nuevo Producto", font=self.TITLE)
         frame.grid(row=0, column=0, columnspan=2, pady=20)
         # Nombre del producto
-        self.label_name = new_label(frame, 'Nombre: ', row=1, column=0)
-        self.entry_name = new_entry(frame, row=1, column=1)
+        self.label_name = new_label(frame, 'Nombre: ',  font=self.TEXT, row=1, column=0)
+        self.entry_name = new_entry(frame, font=self.TEXT, row=1, column=1)
         # Precio
-        self.label_price = new_label(frame, 'Precio: ', row=2, column=0)
-        self.entry_price = new_entry(frame, row=2, column=1)
+        self.label_price = new_label(frame, 'Precio: ', font=self.TEXT, row=2, column=0)
+        self.entry_price = new_entry(frame, font=self.TEXT, row=2, column=1)
         # Categoria
-        self.label_categ = new_label(frame, 'Categoria: ', row=3, column=0)
+        self.label_categ = new_label(frame, 'Categoria: ', font=self.TEXT, row=3, column=0)
         categories = self.db.get_categories() # Query to db
         self.categorie_selection = StringVar(frame)
-        self.menu_categ = new_option_menu(frame, self.categorie_selection, *categories, row=3, column=1, sticky=W+E)
-        self.crete_cat = new_button(frame, '+', self.add_categorie, row=3, column=2, width=3)
+        self.menu_categ = new_option_menu(frame, self.categorie_selection, *categories,  font=self.TEXT, row=3, column=1, sticky=W+E)
+        self.crete_cat = new_button(frame, '+', self.add_categorie, font=self.BUTTON, row=3, column=2, width=3)
         # Boton
-        self.button_add = new_button(frame, 'Guardar producto', self.add_product, row=4, columnspan=2, sticky=W+E)
+        self.button_add = new_button(frame, 'Guardar producto', self.add_product, font=self.BUTTON, row=4, columnspan=2, sticky=W+E)
         # Mensaje
         self.message = new_label(frame=None, text='', fg='red', row=5, column=0, columnspan=2, sticky=W+E)
     
@@ -50,8 +56,8 @@ class ProductWindow(Frame):
 
     def create_action_buttons(self):
         # Botones que llaman a los metodos para eliminar y editar los productos
-        self.delete_button = new_button(None, 'ELIMINAR', self.del_product, row=7, columnspan=1, column=0, sticky=W+E) # del.product
-        self.edit_button = new_button(None, 'EDITAR', self.edit_product, row=7, columnspan=1, column=1, sticky=W+E) # edit.product
+        self.delete_button = new_button(None, 'ELIMINAR', self.del_product,  font=self.BUTTON, row=7, columnspan=1, column=0, sticky=W+E) # del.product
+        self.edit_button = new_button(None, 'EDITAR', self.edit_product, font=self.BUTTON, row=7, columnspan=1, column=1, sticky=W+E) # edit.product
 
     def add_product(self):
         # Atributos del producto
@@ -62,7 +68,7 @@ class ProductWindow(Frame):
             self.message['text'] = f'El precio debe ser un valor numérico'
         elif product_name and product_price and product_categorie: # Si se introducen los 3 campos se guarda en la base de datos
             self.db.add_product(product_name, product_price, product_categorie) # Metodo que introduce el producto en la base de datos
-            self.fill_table()
+            self.update_all()
             self.message['text'] = f'Producto {product_name!r} añadido con éxito'
         elif not product_name and product_price and product_categorie: # Casos en los que falta algun campo
             self.message['text'] = 'El nombre es obligatorio'
@@ -117,6 +123,8 @@ class ProductWindow(Frame):
     def update_all(self):
         self.fill_table()
         self.update_menu()
+        self.entry_name.delete(0, 'end')
+        self.entry_price.delete(0, 'end')
 
     def del_non_using_categories(self):
         # Metodo que elimina las categorias que no estan siendo utilizadas en la tabla producto

@@ -2,6 +2,11 @@ from tk_helper import *
 
 
 class CreateCategorieWindow(Frame):
+    # Estilos
+    TEXT = ('Calibri', 13)
+    BUTTON = ('Calibri', 14, 'bold')
+    TITLE =('Calibri', 16, 'bold')
+
     def __init__(self, parent):
         Frame.__init__(self, parent)
         self.window = new_window("Añadir nueva categoria")
@@ -13,18 +18,19 @@ class CreateCategorieWindow(Frame):
 
     def create_frame(self):
         # Definimos el frame
-        frame = LabelFrame(self.window, text="Introduce nueva categoría", font=('Calibri', 16, 'bold'))
+        frame = LabelFrame(self.window, text="Introduce nueva categoría", font=self.TITLE)
         frame.grid(row=1, column=0, columnspan=2, pady=20)
         # Categoria nueva
-        self.label_name = new_label(frame, "Nueva categoría: ", row=2, column=0)
-        self.entry_name = new_entry(frame, row=2, column=1)
+        self.label_name = new_label(frame, "Nueva categoría: ", font=self.TEXT, row=2, column=0)
+        self.entry_name = new_entry(frame, font=self.TEXT, row=2, column=1)
         self.entry_name.focus()
-        # Boton guardar cambios
-        self.update_button = new_button(frame, 'Añadir', self.commit_changes, row=3, columnspan=2, sticky=W+E)
-        # Boton eliminar categorias en desuso
-        self.update_button = new_button(frame, 'Eliminar categorias en desuso', self.parent.del_non_using_categories, row=4, columnspan=2, sticky=W+E)
         # Mensaje
-        self.message = new_label(frame, text='', fg='red', row=5, column=0, columnspan=2, sticky=W+E)
+        self.message = new_label(frame, text='', fg='red', font=self.TEXT, row=3, column=0, columnspan=2, sticky=W+E)
+        # Boton guardar cambios
+        self.update_button = new_button(frame, 'Añadir', self.commit_changes, font=self.BUTTON, row=4, columnspan=2, pady=2, sticky=W+E)
+        # Boton eliminar categorias en desuso
+        self.update_button = new_button(frame, 'Eliminar categorias en desuso', self.parent.del_non_using_categories, font=self.BUTTON, row=5, columnspan=2, sticky=W+E)
+
 
     def commit_changes(self):
         # Cogemos la categoria introducida por el usuario
