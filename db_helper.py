@@ -23,7 +23,6 @@ class DB:
         query = f'SELECT id FROM categoria WHERE nombre = ?'
         result = self.db_query(query, categorie)
         return result.fetchall()[0]
-  
 
     def get_categories(self):
         query = 'SELECT nombre FROM categoria ORDER BY nombre'
@@ -67,6 +66,32 @@ class DB:
             return True
         return False
 
+    def get_using_categorie_id(self):
+        query = 'SELECT categoriaID FROM producto'
+        result = self.db_query(query)
+        unique_categorie_id = set()
+        for r, in result:
+            unique_categorie_id.add(r)
+        return unique_categorie_id
+
+    def get_all_categorie_id(self): 
+        query = 'SELECT id FROM categoria'
+        result = self.db_query(query)
+        unique_id = set()
+        for r, in result:
+            unique_id.add(r)
+        return unique_id
+    
+    def del_not_using_categories(self):
+        all_ids = self.get_all_categorie_id()
+        using_ids = self.get_using_categorie_id()
+        ids_to_delete = [id for id in all_ids if id not in using_ids]
+        for id in ids_to_delete:
+            query = 'DELETE FROM categoria WHERE id = ?'
+            self.db_query(query, id)
+
+
+
 
 # Debugging
 if __name__ == '__main__':
@@ -74,11 +99,14 @@ if __name__ == '__main__':
     db = 'database/productos.db'
     db = DB(db)
 
-    res = db.get_categories()
-    print(res)
+    # res = db.get_categories()
+    # print(res)
 
-    bol = db.item_in_table(table="categoria", col="nombre", item="Test")
-    print(bol)
+    # bol = db.item_in_table(table="categoria", col="nombre", item="Test")
+    # print(bol)
+
+
+    db.del_not_using_categories()
 
 
     # db.add_product("new", 111) # Añadir nuevo producto

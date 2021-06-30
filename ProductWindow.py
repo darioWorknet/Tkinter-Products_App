@@ -48,9 +48,8 @@ class ProductWindow(Frame):
         self.fill_table()
 
     def create_action_buttons(self):
-        self.delete_button = new_button(None, 'ELIMINAR', self.update_all, row=7, columnspan=1, column=0, sticky=W+E) # del.product
+        self.delete_button = new_button(None, 'ELIMINAR', self.del_product, row=7, columnspan=1, column=0, sticky=W+E) # del.product
         self.edit_button = new_button(None, 'EDITAR', self.edit_product, row=7, columnspan=1, column=1, sticky=W+E) # edit.product
-
 
     def add_product(self):
         # Atributos del producto
