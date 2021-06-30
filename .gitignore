@@ -8,12 +8,6 @@ __pycache__/
 
 # Custom
 .database/productos.db
-Capture.png
- EditWindow.py
-app.py
-python_try.py
-stack_example.py
-tk_example.py
 
 # Distribution / packaging
 .Python
